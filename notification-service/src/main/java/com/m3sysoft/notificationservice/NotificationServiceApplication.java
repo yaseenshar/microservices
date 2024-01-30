@@ -1,3 +1,6 @@
+package com.m3sysoft.notificationservice;
+
+import com.m3sysoft.notificationservice.listener.OrderPlacedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

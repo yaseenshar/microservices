@@ -3,10 +3,13 @@ package com.m3sysoft.orderservice.service;
 import com.m3sysoft.orderservice.dto.InventoryResponse;
 import com.m3sysoft.orderservice.dto.OrderLineItemDto;
 import com.m3sysoft.orderservice.dto.OrderRequest;
+import com.m3sysoft.orderservice.event.OrderPlaceEvent;
 import com.m3sysoft.orderservice.model.Order;
 import com.m3sysoft.orderservice.model.OrderLineItem;
 import com.m3sysoft.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,13 +21,16 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
 
     private final WebClient.Builder webClientBuilder;
 
-    public void placeOrder(OrderRequest orderRequest) {
+    private final KafkaTemplate<String, OrderPlaceEvent> template;
+
+    public String placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
 
@@ -61,6 +67,8 @@ public class OrderService {
         }
         if (Boolean.TRUE.equals(allProductsInStock)) {
             orderRepository.save(order);
+            template.send("notificationTopic", OrderPlaceEvent.builder().orderNumber(order.getOrderNumber()).build());
+            return "Order Placed Successfully";
         } else {
             throw new IllegalArgumentException("Product is not on stock, please try again later");
         }

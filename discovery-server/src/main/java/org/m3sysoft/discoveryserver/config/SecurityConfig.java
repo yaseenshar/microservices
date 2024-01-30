@@ -58,15 +58,28 @@ public class SecurityConfig {
                             .authenticated())
                     .httpBasic(withDefaults());*/
 
-        httpSecurity.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests((authz) -> authz
+       /*  httpSecurity.csrf(csrf -> csrf.disable())
+                /*.authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/eureka/**")
-                        .permitAll())
+                        .permitAll())*/
+                /* .authorizeHttpRequests((authz) -> authz
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(withDefaults());
+*/
+        //return httpSecurity.build();
+
+        /*
+        httpSecurity.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authz) -> authz
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());
 
+        return httpSecurity.build();
+        */
+
+        httpSecurity.csrf().ignoringRequestMatchers("/eureka/**");
         return httpSecurity.build();
     }
 
